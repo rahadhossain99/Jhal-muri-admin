@@ -7,44 +7,37 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
-        @keyframes fadeIn { from: { opacity: 0; } to: { opacity: 1; } }
-        @keyframes popIn { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        /* কাস্টম ফন্ট এবং ব্যাকগ্রাউন্ড স্টাইল */
         body {
-            font-family: 'Noto Sans Bengali', sans-serif;
+            font-family: 'Noto Sans Bengali', 'Inter', sans-serif;
             background-color: #f0fdf4;
             color: #1f2937;
         }
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+
+        /* কাস্টম অ্যানিমেশন */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* হেডার স্টাইল */
         .admin-header {
             background-color: #ffffff;
             backdrop-filter: blur(8px);
             border-radius: 1.5rem;
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem 2rem;
         }
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .user-profile:hover .user-name {
-            color: #ef4444;
-        }
+
+        /* ইউজার প্রোফাইল মেনু */
         .user-menu {
             top: 100%;
             right: 0;
             transform-origin: top right;
             animation: popIn 0.3s ease-out forwards;
         }
+        
+        /* টেবিলের স্টাইল */
         .table-responsive {
             overflow-x: auto;
             border-radius: 1.5rem;
@@ -72,36 +65,45 @@
         tbody tr:nth-child(even) {
             background-color: #ffffff;
         }
-        .approve-btn {
-            background-color: #10b981;
+        tbody tr:hover {
+            background-color: #e2fbe9;
             transition: background-color 0.3s ease;
         }
-        .approve-btn:hover {
-            background-color: #059669;
+        
+        /* বোতামের স্টাইল */
+        .approve-btn, .approve-comment-btn, .reply-btn, .delete-btn {
+            transition: all 0.3s ease;
         }
+        .approve-btn:hover { background-color: #059669; }
+        .approve-comment-btn:hover { background-color: #059669; }
+        .reply-btn:hover { background-color: #1e40af; }
+        .delete-btn:hover { background-color: #b91c1c; }
     </style>
 </head>
 <body>
 
     <header class="admin-header sticky top-5 z-50 mt-5 mx-4">
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center py-4 px-6">
             <h1 class="text-3xl font-extrabold text-gray-800">এডমিন ড্যাশবোর্ড</h1>
-            <div id="auth-ui" class="relative">
-                <!-- Auth UI will be rendered here by JS -->
+            <div id="auth-ui" class="relative group">
+                <!-- এখানে লগইন বা ইউজার প্রোফাইল থাকবে -->
             </div>
         </div>
     </header>
 
-    <main class="container py-8">
-        <div id="access-denied" class="hidden text-center bg-red-100 border-l-4 border-red-500 text-red-700 p-8 rounded-lg mt-10">
+    <main class="container max-w-7xl mx-auto py-8 px-4">
+        <!-- অ্যাক্সেস অনুমোদিত নয় মেসেজ -->
+        <div id="access-denied" class="hidden text-center bg-red-100 border-l-4 border-red-500 text-red-700 p-8 rounded-lg mt-10 animate-[fadeIn_0.5s_ease-in-out]">
             <h2 class="text-3xl font-bold mb-4 flex items-center justify-center">
                 <i class="fas fa-exclamation-triangle mr-3 text-red-500"></i> অ্যাক্সেস অনুমোদিত নয়!
             </h2>
             <p class="text-lg">এই পেজটি শুধুমাত্র এডমিনদের জন্য। অনুগ্রহ করে সঠিক ইমেইল দিয়ে লগইন করুন।</p>
         </div>
 
+        <!-- এডমিন ড্যাশবোর্ড কন্টেন্ট -->
         <div id="dashboard-content" class="hidden space-y-12">
-            <!-- Pending Orders Section -->
+            
+            <!-- পেন্ডিং অর্ডার সেকশন -->
             <div class="bg-white p-8 rounded-3xl shadow-2xl animate-[fadeIn_1s_ease-in-out]">
                 <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                     <i class="fas fa-clock text-amber-500 mr-3"></i> পেন্ডিং অর্ডারসমূহ
@@ -126,7 +128,7 @@
                 </div>
             </div>
             
-            <!-- Pending Comments Section -->
+            <!-- পেন্ডিং মন্তব্য সেকশন -->
             <div class="bg-white p-8 rounded-3xl shadow-2xl animate-[fadeIn_1s_ease-in-out]">
                 <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                     <i class="fas fa-comments text-amber-500 mr-3"></i> পেন্ডিং মন্তব্যসমূহ
@@ -136,7 +138,7 @@
                 </div>
             </div>
 
-            <!-- Approved Comments Section -->
+            <!-- অ্যাপ্রুভড মন্তব্য সেকশন -->
             <div class="bg-white p-8 rounded-3xl shadow-2xl animate-[fadeIn_1s_ease-in-out]">
                 <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                     <i class="fas fa-check-circle text-green-500 mr-3"></i> অ্যাপ্রুভড মন্তব্যসমূহ
@@ -146,21 +148,21 @@
                 </div>
             </div>
 
-            <!-- Manage Coupons Section -->
+            <!-- কুপন ম্যানেজমেন্ট সেকশন -->
             <div class="bg-white p-8 rounded-3xl shadow-2xl animate-[fadeIn_1s_ease-in-out]">
                 <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                     <i class="fas fa-tags text-blue-500 mr-3"></i> কুপন ম্যানেজমেন্ট
                 </h3>
-                <form id="coupon-form" class="flex items-end space-x-4 mb-6">
-                    <div class="flex-1">
+                <form id="coupon-form" class="flex flex-col md:flex-row items-end space-y-4 md:space-y-0 md:space-x-4 mb-6">
+                    <div class="flex-1 w-full">
                         <label for="new-coupon-code" class="block text-sm font-medium text-gray-700">কুপন কোড</label>
-                        <input type="text" id="new-coupon-code" class="mt-1 input-field w-full p-2 rounded-lg" placeholder="যেমন: JHALMURI20">
+                        <input type="text" id="new-coupon-code" class="mt-1 input-field w-full p-2 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="যেমন: JHALMURI20">
                     </div>
-                    <div class="flex-1">
+                    <div class="flex-1 w-full">
                         <label for="new-coupon-discount" class="block text-sm font-medium text-gray-700">ছাড়ের পরিমাণ (৳)</label>
-                        <input type="number" id="new-coupon-discount" class="mt-1 input-field w-full p-2 rounded-lg" placeholder="যেমন: 200">
+                        <input type="number" id="new-coupon-discount" class="mt-1 input-field w-full p-2 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="যেমন: 200">
                     </div>
-                    <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-600 transition-colors">যোগ করুন</button>
+                    <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-600 transition-colors w-full md:w-auto">যোগ করুন</button>
                 </form>
                 <div class="table-responsive">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -179,11 +181,20 @@
         </div>
     </main>
 
+    <!-- Custom Success/Error Modal -->
+    <div id="custom-alert-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[1001] hidden">
+        <div class="modal-content w-11/12 max-w-sm bg-white rounded-2xl shadow-2xl relative p-8 text-center">
+            <h3 id="alert-title" class="text-2xl font-bold mb-4"></h3>
+            <p id="alert-message" class="text-lg text-gray-700 mb-6"></p>
+            <button id="alert-ok-button" class="bg-green-500 text-white py-2 px-6 rounded-full font-bold hover:bg-green-600 transition-colors">ঠিক আছে</button>
+        </div>
+    </div>
+
     <script type="module">
         // Firebase SDKs আমদানি করা হচ্ছে
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc, addDoc, serverTimestamp, getDocs, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase কনফিগারেশন
         const firebaseConfig = {
@@ -215,8 +226,30 @@
         const couponCodeInput = document.getElementById('new-coupon-code');
         const couponDiscountInput = document.getElementById('new-coupon-discount');
         const couponsTableBody = document.getElementById('coupons-table-body');
+        const customAlertModal = document.getElementById('custom-alert-modal');
+        const alertTitle = document.getElementById('alert-title');
+        const alertMessage = document.getElementById('alert-message');
+        const alertOkButton = document.getElementById('alert-ok-button');
         
         const ADMIN_EMAIL = 'smartwork19999@gmail.com'; // এডমিন ইমেইল
+
+        // কাস্টম alert() এর বিকল্প
+        function showAlert(title, message, isSuccess = true) {
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+            if (isSuccess) {
+                alertTitle.classList.add('text-green-600');
+                alertTitle.classList.remove('text-red-600');
+                alertOkButton.classList.remove('bg-red-500', 'hover:bg-red-600');
+                alertOkButton.classList.add('bg-green-500', 'hover:bg-green-600');
+            } else {
+                alertTitle.classList.add('text-red-600');
+                alertTitle.classList.remove('text-green-600');
+                alertOkButton.classList.remove('bg-green-500', 'hover:bg-green-600');
+                alertOkButton.classList.add('bg-red-500', 'hover:bg-red-600');
+            }
+            customAlertModal.classList.remove('hidden');
+        }
 
         // Google লগইন ফাংশন
         async function signInWithGoogle() {
@@ -257,8 +290,8 @@
                             <td class="px-6 py-4">${order.quantity}</td>
                             <td class="px-6 py-4">৳${order.totalPrice.toLocaleString('bn-BD')}</td>
                             <td class="px-6 py-4">${new Date(order.timestamp.seconds * 1000).toLocaleString('bn-BD')}</td>
-                            <td class="px-6 py-4 text-right">
-                                <button data-id="${orderId}" class="approve-btn text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">অ্যাপ্রুভ</button>
+                            <td class="px-6 py-4">
+                                <button data-id="${orderId}" class="approve-btn bg-green-500 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">অ্যাপ্রুভ</button>
                             </td>
                         `;
                         pendingOrdersBody.appendChild(row);
@@ -278,9 +311,10 @@
             try {
                 const orderRef = doc(db, "orders", orderId);
                 await updateDoc(orderRef, { status: 'Approved' });
-                console.log("Order approved successfully!");
+                showAlert('সফল!', 'অর্ডারটি সফলভাবে অ্যাপ্রুভ করা হয়েছে।', true);
             } catch (error) {
                 console.error("Failed to approve order:", error);
+                showAlert('ব্যর্থ', 'অর্ডার অ্যাপ্রুভ করতে সমস্যা হয়েছে।', false);
             }
         }
         
@@ -299,20 +333,21 @@
                         const commentCard = document.createElement('div');
                         commentCard.className = 'bg-gray-100 p-6 rounded-xl border border-gray-200';
                         commentCard.innerHTML = `
-                            <div class="flex items-center space-x-4 mb-4">
-                                <img src="${comment.userPhotoURL || 'https://placehold.co/50x50/e2e8f0/334155?text=🧑'}" alt="${comment.userName}" class="w-12 h-12 rounded-full">
+                            <div class="flex items-start space-x-4 mb-4">
+                                <img src="${comment.userPhotoURL || 'https://placehold.co/50x50/e2e8f0/334155?text=🧑'}" alt="${comment.userName}" class="w-12 h-12 rounded-full flex-shrink-0">
                                 <div>
                                     <p class="font-bold text-xl">${comment.userName}</p>
                                     <p class="text-sm text-gray-500">${new Date(comment.timestamp.seconds * 1000).toLocaleDateString('bn-BD')}</p>
                                 </div>
                             </div>
                             <p class="text-lg text-gray-700 mb-4">${comment.text}</p>
-                            <div class="flex space-x-2">
+                            <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
                                 <button data-id="${commentId}" class="approve-comment-btn bg-green-500 text-white font-bold py-2 px-4 rounded-full hover:bg-green-600 transition-colors">অ্যাপ্রুভ</button>
                                 <form class="flex-1 flex space-x-2 reply-form" data-id="${commentId}">
-                                    <input type="text" class="input-field flex-1 p-2 rounded-lg" placeholder="উত্তর লিখুন...">
-                                    <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-600 transition-colors">উত্তর দিন</button>
+                                    <input type="text" class="input-field flex-1 p-2 rounded-lg border-2" placeholder="উত্তর লিখুন...">
+                                    <button type="submit" class="reply-btn bg-blue-500 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-600 transition-colors">উত্তর দিন</button>
                                 </form>
+                                <button data-id="${commentId}" class="delete-comment-btn bg-red-500 text-white font-bold py-2 px-4 rounded-full hover:bg-red-600 transition-colors">মুছে ফেলুন</button>
                             </div>
                         `;
                         pendingCommentsContainer.appendChild(commentCard);
@@ -329,6 +364,13 @@
                             const commentToReplyId = e.target.dataset.id;
                             const replyText = e.target.querySelector('input').value;
                             replyToComment(commentToReplyId, replyText);
+                            e.target.querySelector('input').value = ''; // ইনপুট খালি করা
+                        });
+                    });
+                    document.querySelectorAll('.delete-comment-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const commentToDeleteId = e.target.dataset.id;
+                            deleteComment(commentToDeleteId);
                         });
                     });
                 }
@@ -340,9 +382,21 @@
             try {
                 const commentRef = doc(db, "comments", commentId);
                 await updateDoc(commentRef, { status: 'Approved' });
-                console.log("Comment approved successfully!");
+                showAlert('সফল!', 'মন্তব্যটি সফলভাবে অ্যাপ্রুভ করা হয়েছে।', true);
             } catch (error) {
                 console.error("Failed to approve comment:", error);
+                showAlert('ব্যর্থ', 'মন্তব্য অ্যাপ্রুভ করতে সমস্যা হয়েছে।', false);
+            }
+        }
+
+        // একটি মন্তব্য মুছে ফেলার ফাংশন
+        async function deleteComment(commentId) {
+            try {
+                await deleteDoc(doc(db, "comments", commentId));
+                showAlert('সফল!', 'মন্তব্যটি সফলভাবে মুছে ফেলা হয়েছে।', true);
+            } catch (error) {
+                console.error("Failed to delete comment:", error);
+                showAlert('ব্যর্থ', 'মন্তব্য মুছে ফেলতে সমস্যা হয়েছে।', false);
             }
         }
         
@@ -351,9 +405,10 @@
             try {
                 const commentRef = doc(db, "comments", commentId);
                 await updateDoc(commentRef, { adminReply: replyText });
-                console.log("Reply added successfully!");
+                showAlert('সফল!', 'মন্তব্যে উত্তর সফলভাবে যোগ করা হয়েছে।', true);
             } catch (error) {
                 console.error("Failed to reply to comment:", error);
+                showAlert('ব্যর্থ', 'মন্তব্যে উত্তর দিতে সমস্যা হয়েছে।', false);
             }
         }
         
@@ -379,8 +434,8 @@
                             `;
                         }
                         commentCard.innerHTML = `
-                            <div class="flex items-center space-x-4">
-                                <img src="${comment.userPhotoURL || 'https://placehold.co/50x50/e2e8f0/334155?text=🧑'}" alt="${comment.userName}" class="w-12 h-12 rounded-full">
+                            <div class="flex items-start space-x-4">
+                                <img src="${comment.userPhotoURL || 'https://placehold.co/50x50/e2e8f0/334155?text=🧑'}" alt="${comment.userName}" class="w-12 h-12 rounded-full flex-shrink-0">
                                 <div>
                                     <p class="font-bold">${comment.userName}</p>
                                     <p class="text-sm text-gray-500">${new Date(comment.timestamp.seconds * 1000).toLocaleDateString('bn-BD')}</p>
@@ -401,7 +456,7 @@
             const couponCode = couponCodeInput.value.trim().toUpperCase();
             const discount = parseFloat(couponDiscountInput.value);
             if (!couponCode || isNaN(discount) || discount <= 0) {
-                alert("অনুগ্রহ করে সঠিক কুপন কোড এবং ছাড়ের পরিমাণ দিন।");
+                showAlert("ব্যর্থ", "অনুগ্রহ করে সঠিক কুপন কোড এবং ছাড়ের পরিমাণ দিন।", false);
                 return;
             }
             
@@ -411,11 +466,11 @@
                     discount: discount,
                     timestamp: serverTimestamp()
                 });
-                alert("কুপন সফলভাবে যোগ করা হয়েছে!");
+                showAlert("সফল!", "কুপন সফলভাবে যোগ করা হয়েছে!", true);
                 couponForm.reset();
             } catch (error) {
                 console.error("Error adding coupon:", error);
-                alert("কুপন যোগ করতে ব্যর্থ হয়েছে।");
+                showAlert("ব্যর্থ", "কুপন যোগ করতে ব্যর্থ হয়েছে।", false);
             }
         }
         
@@ -440,14 +495,14 @@
             });
         }
 
-        //AuthState পরিবর্তন হলে এই ফাংশনটি কল হবে
+        // AuthState পরিবর্তন হলে এই ফাংশনটি কল হবে
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === ADMIN_EMAIL) {
                 authUI.innerHTML = `
-                    <div class="user-profile relative group">
+                    <div class="user-profile relative group flex items-center gap-2 cursor-pointer transition-all duration-300">
                         <img src="${user.photoURL || 'https://placehold.co/40x40/e2e8f0/334155?text=🧑'}" alt="${user.displayName}" class="w-10 h-10 rounded-full border-2 border-green-500">
                         <span class="user-name font-semibold text-gray-800 hidden md:inline-block">${user.displayName.split(' ')[0]}</span>
-                        <div class="user-menu absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                        <div class="user-menu absolute hidden group-hover:block transition-all duration-300 w-48 bg-white rounded-xl shadow-lg p-2 z-50 animate-popIn">
                             <p class="px-4 py-2 font-bold text-gray-800 border-b pb-2">স্বাগতম, এডমিন</p>
                             <button id="signOutButton" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-semibold mt-2">
                                 <i class="fas fa-sign-out-alt mr-2"></i> লগআউট
@@ -478,6 +533,7 @@
         // ইভেন্ট লিসেনার
         document.addEventListener('DOMContentLoaded', function() {
             couponForm.addEventListener('submit', handleCouponSubmit);
+            alertOkButton.addEventListener('click', () => customAlertModal.classList.add('hidden'));
         });
     </script>
 </body>
