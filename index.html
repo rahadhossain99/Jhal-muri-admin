@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>এডমিন ড্যাশবোর্ড - eFoodDokan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes fadeIn { from: { opacity: 0; } to: { opacity: 1; } }
+        @keyframes popIn { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        body {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            background-color: #f0fdf4;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .admin-header {
+            background-color: #ffffff;
+            backdrop-filter: blur(8px);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem 2rem;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .user-profile:hover .user-name {
+            color: #ef4444;
+        }
+        .user-menu {
+            top: 100%;
+            right: 0;
+            transform-origin: top right;
+            animation: popIn 0.3s ease-out forwards;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 1.5rem;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 1rem 1.5rem;
+            white-space: nowrap;
+        }
+        thead th {
+            background-color: #d1fae5;
+            color: #10b981;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: #f9fafb;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+        .approve-btn {
+            background-color: #10b981;
+            transition: background-color 0.3s ease;
+        }
+        .approve-btn:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="admin-header sticky top-5 z-50 mt-5 mx-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold text-gray-800">এডমিন ড্যাশবোর্ড</h1>
+            <div id="auth-ui" class="relative">
+                <!-- Auth UI will be rendered here by JS -->
+            </div>
+        </div>
+    </header>
+
+    <main class="container py-8">
+        <div id="access-denied" class="hidden text-center bg-red-100 border-l-4 border-red-500 text-red-700 p-8 rounded-lg mt-10">
+            <h2 class="text-3xl font-bold mb-4 flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle mr-3 text-red-500"></i> অ্যাক্সেস অনুমোদিত নয়!
+            </h2>
+            <p class="text-lg">এই পেজটি শুধুমাত্র এডমিনদের জন্য। অনুগ্রহ করে সঠিক ইমেইল দিয়ে লগইন করুন।</p>
+        </div>
+
+        <div id="dashboard-content" class="hidden space-y-12">
+            <!-- Pending Orders Section -->
+            <div class="bg-white p-8 rounded-3xl shadow-2xl animate-[fadeIn_1s_ease-in-out]">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-clock text-amber-500 mr-3"></i> পেন্ডিং অর্ডারসমূহ
+                </h3>
+                <div class="table-responsive">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="px-6 py-3">অর্ডার আইডি</th>
+                                <th scope="col" class="px-6 py-3">নাম</th>
+                                <th scope="col" class="px-6 py-3">ফোন</th>
+                                <th scope="col" class="px-6 py-3">পরিমাণ</th>
+                                <th scope="col" class="px-6 py-3">সর্বমোট</th>
+                                <th scope="col" class="px-6 py-3">সময়</th>
+                                <th scope="col" class="px-6 py-3">অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-orders-body" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">কোনো পেন্ডিং অর্ডার নেই।</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Pending Comments Section -->
+            <div class="bg-white p-8 rounded-3xl shadow-2xl animate-[fadeIn_1s_ease-in-out]">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-comments text-amber-500 mr-3"></i> পেন্ডিং মন্তব্যসমূহ
+                </h3>
+                <div class="space-y-6" id="pending-comments-container">
+                    <p id="no-pending-comments" class="text-center text-gray-500 text-lg">কোনো নতুন মন্তব্য নেই।</p>
+                </div>
+            </div>
+
+            <!-- Approved Comments Section -->
+            <div class="bg-white p-8 rounded-3xl shadow-2xl animate-[fadeIn_1s_ease-in-out]">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i> অ্যাপ্রুভড মন্তব্যসমূহ
+                </h3>
+                <div class="space-y-6" id="approved-comments-container">
+                    <p id="no-approved-comments" class="text-center text-gray-500 text-lg">কোনো অ্যাপ্রুভড মন্তব্য নেই।</p>
+                </div>
+            </div>
+
+            <!-- Manage Coupons Section -->
+            <div class="bg-white p-8 rounded-3xl shadow-2xl animate-[fadeIn_1s_ease-in-out]">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-tags text-blue-500 mr-3"></i> কুপন ম্যানেজমেন্ট
+                </h3>
+                <form id="coupon-form" class="flex items-end space-x-4 mb-6">
+                    <div class="flex-1">
+                        <label for="new-coupon-code" class="block text-sm font-medium text-gray-700">কুপন কোড</label>
+                        <input type="text" id="new-coupon-code" class="mt-1 input-field w-full p-2 rounded-lg" placeholder="যেমন: JHALMURI20">
+                    </div>
+                    <div class="flex-1">
+                        <label for="new-coupon-discount" class="block text-sm font-medium text-gray-700">ছাড়ের পরিমাণ (৳)</label>
+                        <input type="number" id="new-coupon-discount" class="mt-1 input-field w-full p-2 rounded-lg" placeholder="যেমন: 200">
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-600 transition-colors">যোগ করুন</button>
+                </form>
+                <div class="table-responsive">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="px-6 py-3">কুপন কোড</th>
+                                <th scope="col" class="px-6 py-3">ছাড়</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coupons-table-body" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">কোনো কুপন নেই।</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        // Firebase SDKs আমদানি করা হচ্ছে
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTvWKR6pt8HrHoiDHo3wqoSXtXdXJjHHQ",
+            authDomain: "priya-ai-q14sj.firebaseapp.com",
+            projectId: "priya-ai-q14sj",
+            storageBucket: "priya-ai-q14sj.firebasestorage.app",
+            messagingSenderId: "113852032496",
+            appId: "1:113852032496:web:a6156f264323f54d9ae935",
+            measurementId: "G-4VFJ2W36XH"
+        };
+
+        // Firebase ইনিশিয়ালাইজ করা
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // UI উপাদানগুলো নির্বাচন করা
+        const authUI = document.getElementById('auth-ui');
+        const dashboardContent = document.getElementById('dashboard-content');
+        const accessDeniedMsg = document.getElementById('access-denied');
+        const pendingOrdersBody = document.getElementById('pending-orders-body');
+        const pendingCommentsContainer = document.getElementById('pending-comments-container');
+        const noPendingComments = document.getElementById('no-pending-comments');
+        const approvedCommentsContainer = document.getElementById('approved-comments-container');
+        const noApprovedComments = document.getElementById('no-approved-comments');
+        const couponForm = document.getElementById('coupon-form');
+        const couponCodeInput = document.getElementById('new-coupon-code');
+        const couponDiscountInput = document.getElementById('new-coupon-discount');
+        const couponsTableBody = document.getElementById('coupons-table-body');
+        
+        const ADMIN_EMAIL = 'smartwork19999@gmail.com'; // এডমিন ইমেইল
+
+        // Google লগইন ফাংশন
+        async function signInWithGoogle() {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Google লগইন ব্যর্থ হয়েছে: ", error);
+            }
+        }
+        
+        // Google লগআউট ফাংশন
+        async function handleSignOut() {
+            try {
+                await signOut(auth);
+                console.log("সফলভাবে লগআউট হয়েছে");
+            } catch (error) {
+                console.error("লগআউট ব্যর্থ হয়েছে:", error);
+            }
+        }
+
+        // পেন্ডিং অর্ডারগুলো লোড করার ফাংশন
+        function loadPendingOrders() {
+            const q = query(collection(db, "orders"), where("status", "==", "Pending"), orderBy("timestamp", "desc"));
+
+            onSnapshot(q, (querySnapshot) => {
+                pendingOrdersBody.innerHTML = '';
+                if (querySnapshot.empty) {
+                    pendingOrdersBody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">কোনো পেন্ডিং অর্ডার নেই।</td></tr>`;
+                } else {
+                    querySnapshot.forEach((docSnapshot) => {
+                        const order = docSnapshot.data();
+                        const orderId = docSnapshot.id;
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="px-6 py-4">${order.id}</td>
+                            <td class="px-6 py-4">${order.userName}</td>
+                            <td class="px-6 py-4">${order.userPhone}</td>
+                            <td class="px-6 py-4">${order.quantity}</td>
+                            <td class="px-6 py-4">৳${order.totalPrice.toLocaleString('bn-BD')}</td>
+                            <td class="px-6 py-4">${new Date(order.timestamp.seconds * 1000).toLocaleString('bn-BD')}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button data-id="${orderId}" class="approve-btn text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">অ্যাপ্রুভ</button>
+                            </td>
+                        `;
+                        pendingOrdersBody.appendChild(row);
+                    });
+                    document.querySelectorAll('.approve-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const orderToApproveId = e.target.dataset.id;
+                            approveOrder(orderToApproveId);
+                        });
+                    });
+                }
+            });
+        }
+        
+        // একটি অর্ডার অ্যাপ্রুভ করার ফাংশন
+        async function approveOrder(orderId) {
+            try {
+                const orderRef = doc(db, "orders", orderId);
+                await updateDoc(orderRef, { status: 'Approved' });
+                console.log("Order approved successfully!");
+            } catch (error) {
+                console.error("Failed to approve order:", error);
+            }
+        }
+        
+        // পেন্ডিং মন্তব্যগুলো লোড করার ফাংশন
+        function loadPendingComments() {
+            const q = query(collection(db, "comments"), where("status", "==", "Pending"), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (querySnapshot) => {
+                pendingCommentsContainer.innerHTML = '';
+                if (querySnapshot.empty) {
+                    pendingCommentsContainer.appendChild(noPendingComments);
+                } else {
+                    querySnapshot.forEach((docSnapshot) => {
+                        const comment = docSnapshot.data();
+                        const commentId = docSnapshot.id;
+                        const commentCard = document.createElement('div');
+                        commentCard.className = 'bg-gray-100 p-6 rounded-xl border border-gray-200';
+                        commentCard.innerHTML = `
+                            <div class="flex items-center space-x-4 mb-4">
+                                <img src="${comment.userPhotoURL || 'https://placehold.co/50x50/e2e8f0/334155?text=🧑'}" alt="${comment.userName}" class="w-12 h-12 rounded-full">
+                                <div>
+                                    <p class="font-bold text-xl">${comment.userName}</p>
+                                    <p class="text-sm text-gray-500">${new Date(comment.timestamp.seconds * 1000).toLocaleDateString('bn-BD')}</p>
+                                </div>
+                            </div>
+                            <p class="text-lg text-gray-700 mb-4">${comment.text}</p>
+                            <div class="flex space-x-2">
+                                <button data-id="${commentId}" class="approve-comment-btn bg-green-500 text-white font-bold py-2 px-4 rounded-full hover:bg-green-600 transition-colors">অ্যাপ্রুভ</button>
+                                <form class="flex-1 flex space-x-2 reply-form" data-id="${commentId}">
+                                    <input type="text" class="input-field flex-1 p-2 rounded-lg" placeholder="উত্তর লিখুন...">
+                                    <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-600 transition-colors">উত্তর দিন</button>
+                                </form>
+                            </div>
+                        `;
+                        pendingCommentsContainer.appendChild(commentCard);
+                    });
+                    document.querySelectorAll('.approve-comment-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const commentToApproveId = e.target.dataset.id;
+                            approveComment(commentToApproveId);
+                        });
+                    });
+                    document.querySelectorAll('.reply-form').forEach(form => {
+                        form.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            const commentToReplyId = e.target.dataset.id;
+                            const replyText = e.target.querySelector('input').value;
+                            replyToComment(commentToReplyId, replyText);
+                        });
+                    });
+                }
+            });
+        }
+
+        // একটি মন্তব্য অ্যাপ্রুভ করার ফাংশন
+        async function approveComment(commentId) {
+            try {
+                const commentRef = doc(db, "comments", commentId);
+                await updateDoc(commentRef, { status: 'Approved' });
+                console.log("Comment approved successfully!");
+            } catch (error) {
+                console.error("Failed to approve comment:", error);
+            }
+        }
+        
+        // মন্তব্যে উত্তর দেওয়ার ফাংশন
+        async function replyToComment(commentId, replyText) {
+            try {
+                const commentRef = doc(db, "comments", commentId);
+                await updateDoc(commentRef, { adminReply: replyText });
+                console.log("Reply added successfully!");
+            } catch (error) {
+                console.error("Failed to reply to comment:", error);
+            }
+        }
+        
+        // অ্যাপ্রুভড মন্তব্যগুলো লোড করার ফাংশন
+        function loadApprovedComments() {
+            const q = query(collection(db, "comments"), where("status", "==", "Approved"), orderBy("timestamp", "desc"));
+            onSnapshot(q, (querySnapshot) => {
+                approvedCommentsContainer.innerHTML = '';
+                if (querySnapshot.empty) {
+                    approvedCommentsContainer.appendChild(noApprovedComments);
+                } else {
+                    querySnapshot.forEach((docSnapshot) => {
+                        const comment = docSnapshot.data();
+                        const commentCard = document.createElement('div');
+                        commentCard.className = 'bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500';
+                        let replyHtml = '';
+                        if (comment.adminReply) {
+                            replyHtml = `
+                                <div class="bg-green-50 p-3 rounded-lg mt-4">
+                                    <p class="font-bold text-green-800">এডমিন:</p>
+                                    <p class="text-gray-700">${comment.adminReply}</p>
+                                </div>
+                            `;
+                        }
+                        commentCard.innerHTML = `
+                            <div class="flex items-center space-x-4">
+                                <img src="${comment.userPhotoURL || 'https://placehold.co/50x50/e2e8f0/334155?text=🧑'}" alt="${comment.userName}" class="w-12 h-12 rounded-full">
+                                <div>
+                                    <p class="font-bold">${comment.userName}</p>
+                                    <p class="text-sm text-gray-500">${new Date(comment.timestamp.seconds * 1000).toLocaleDateString('bn-BD')}</p>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-gray-800">${comment.text}</p>
+                            ${replyHtml}
+                        `;
+                        approvedCommentsContainer.appendChild(commentCard);
+                    });
+                }
+            });
+        }
+
+        // কুপন ফর্ম সাবমিট করার ফাংশন
+        async function handleCouponSubmit(e) {
+            e.preventDefault();
+            const couponCode = couponCodeInput.value.trim().toUpperCase();
+            const discount = parseFloat(couponDiscountInput.value);
+            if (!couponCode || isNaN(discount) || discount <= 0) {
+                alert("অনুগ্রহ করে সঠিক কুপন কোড এবং ছাড়ের পরিমাণ দিন।");
+                return;
+            }
+            
+            try {
+                await addDoc(collection(db, "coupons"), {
+                    code: couponCode,
+                    discount: discount,
+                    timestamp: serverTimestamp()
+                });
+                alert("কুপন সফলভাবে যোগ করা হয়েছে!");
+                couponForm.reset();
+            } catch (error) {
+                console.error("Error adding coupon:", error);
+                alert("কুপন যোগ করতে ব্যর্থ হয়েছে।");
+            }
+        }
+        
+        // কুপনগুলো লোড করার ফাংশন
+        function loadCoupons() {
+            const q = query(collection(db, "coupons"), orderBy("timestamp", "desc"));
+            onSnapshot(q, (querySnapshot) => {
+                couponsTableBody.innerHTML = '';
+                if (querySnapshot.empty) {
+                    couponsTableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">কোনো কুপন নেই।</td></tr>`;
+                } else {
+                    querySnapshot.forEach((docSnapshot) => {
+                        const coupon = docSnapshot.data();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="px-6 py-4">${coupon.code}</td>
+                            <td class="px-6 py-4">৳${coupon.discount.toLocaleString('bn-BD')}</td>
+                        `;
+                        couponsTableBody.appendChild(row);
+                    });
+                }
+            });
+        }
+
+        //AuthState পরিবর্তন হলে এই ফাংশনটি কল হবে
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ADMIN_EMAIL) {
+                authUI.innerHTML = `
+                    <div class="user-profile relative group">
+                        <img src="${user.photoURL || 'https://placehold.co/40x40/e2e8f0/334155?text=🧑'}" alt="${user.displayName}" class="w-10 h-10 rounded-full border-2 border-green-500">
+                        <span class="user-name font-semibold text-gray-800 hidden md:inline-block">${user.displayName.split(' ')[0]}</span>
+                        <div class="user-menu absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                            <p class="px-4 py-2 font-bold text-gray-800 border-b pb-2">স্বাগতম, এডমিন</p>
+                            <button id="signOutButton" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-semibold mt-2">
+                                <i class="fas fa-sign-out-alt mr-2"></i> লগআউট
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('signOutButton').addEventListener('click', handleSignOut);
+                dashboardContent.classList.remove('hidden');
+                accessDeniedMsg.classList.add('hidden');
+                loadPendingOrders();
+                loadPendingComments();
+                loadApprovedComments();
+                loadCoupons();
+            } else {
+                authUI.innerHTML = `
+                    <button id="googleSignInButton" class="bg-blue-500 text-white py-2 px-4 rounded-full font-bold flex items-center space-x-2 shadow-lg hover:bg-blue-600 transition-colors">
+                        <i class="fab fa-google"></i>
+                        <span>লগইন করুন</span>
+                    </button>
+                `;
+                document.getElementById('googleSignInButton').addEventListener('click', signInWithGoogle);
+                dashboardContent.classList.add('hidden');
+                accessDeniedMsg.classList.remove('hidden');
+            }
+        });
+        
+        // ইভেন্ট লিসেনার
+        document.addEventListener('DOMContentLoaded', function() {
+            couponForm.addEventListener('submit', handleCouponSubmit);
+        });
+    </script>
+</body>
+</html>
